@@ -1,0 +1,295 @@
+
+r4
+conf t
+ int e0/0
+ ip add 10.8.100.90 255.255.255.224
+ no shut
+ end
+
+google
+conf t
+ int e0/0
+ ip add 10.8.100.99 255.255.255.224
+ no shut
+ end
+
+
+conf t
+int e0/0
+shutdown
+end
+
+r1
+conf t
+ip route 10.1.1.4 255.255.255.252 10.1.1.2
+end
+ping 10.1.1.5
+
+r3
+conf t
+ip route 10.1.1.0 255.255.255.252 10.1.1.5
+end
+ping 10.1.1.1
+
+
+
+r1
+conf t
+ip route 10.1.1.8 255.255.255.252 10.1.1.2
+end
+
+r4
+conf t
+ip route 10.1.1.0 255.255.255.252 10.1.1.9
+end
+ping 10.1.1.1
+
+r2
+conf t
+ip route 10.1.1.8 255.255.255.252 10.1.1.6
+end
+
+
+p2
+conf 
+ip route 192.168.1.129 255.255.255.224 10.2.1.2
+end
+traceroute 192.168.1.129
+
+conf t
+ip route 192.168.1.129 255.255.255.255 10.2.1.1
+end
+traceroute 192.168.1.129
+
+
+r4
+conf t
+int e3/3
+no shut
+ip add dhcp 
+router eigrp 100
+network 208.8.8.0 0.0.0.255
+
+
+
+
+d2
+conf t
+router eigrp 100
+network 10.1.4.8 0.0.0.3
+network 10.2.1.0 0.0.0.255
+network 10.2.2.0 0.0.0.255
+network 192.168.1.128 0.0.0.31
+
+
+r3
+conf t
+ router ospf 1
+  router-id 3.3.3.3
+  network 3.3.3.3 0.0.0.0 area 0
+  network 10.1.1.8 0.0.0.3 area 34
+  network 10.1.1.4 0.0.0.3 area 0
+  end
+
+
+r4
+ router ospf 1
+  router-id 4.4.4.4
+  network 4.4.4.4 0.0.0.0 area 34
+  network 10.1.1.8 0.0.0.3 area 34
+  end
+
+r2
+conf t
+ router ospf 1
+  router-id 2.2.2.2
+  network 2.2.2.2 0.0.0.0 area 0
+  network 10.1.1.0 0.0.0.3 area 12
+  network 10.1.1.4 0.0.0.3 area 0
+  end
+
+r1
+conf t
+ router ospf 1
+  router-id 1.1.1.1
+  exit
+ int lo1
+  ip ospf 1 area 12
+  exit
+ int e1/0
+  ip ospf 1 area 12
+  end
+
+
+d down
+i init
+t two
+e exstart
+e exchange
+l loading
+f full
+
+
+
+
+
+eigrp
+conf t
+router eigrp 100
+no auto-summary
+network 10.46.187.22 0.0.0.0
+network 192.168.0.152 0.0.0.3
+network 10.0.15.64 0.0.0.31
+
+
+conf t
+router ospf 1
+router-id 10.46.178.22
+network 10.46.178.22
+network 192.168.0.152 0.0.0.3 area 0
+network 10.0.15.64 0.0.0.31 area 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CONFIGURE THE NAT
+
+STEP 1
+!@r1
+conf t
+int e1/0
+ip nat inside
+int range e1/1-3
+ip nat outside
+end
+
+STEP 2 1:1 NAT
+!@r1
+conf t
+ip nat inside source static 10.1.1.10 209.9.9.10
+end
+
+
+STEP 3 1:MANY NAT
+!@R1
+conf t
+ access-list 1 permit 10.0.0.0 0.255.255.255
+ access-list 1 permit 172.16.0.0 0.15.255.255
+ access-list 1 permit 192.168.0.0 0.0.255.255
+ ip nat inside source list 1 int e1/2 overload
+ end
+
+
+
+!@r1
+conf t
+ip route 192.168.3.1 255.255.255.255 209.165.200.226
+ip route 209.165.200.230 255.255.255.255 209.165.200.226
+end
+
+
+
+!@r2
+conf t
+!!!ip route 192.168.3.1 255.255.255.255 209.165.200.230   di na kasama ito kahit one way nalang
+ip route 192.168.1.1 2555.255.255.255 209.165.200.225
+end
+
+!@r3
+conf t
+ip route 192.168.1.1 255.255.255.255 209.165.200.229
+end
+
+!@r2
+conf t
+ip route 0.0.0.0 0.0.0.0 209.165.202.130
+end
+
+!@r2
+conf t
+ipv6 route ::/0 2001:db8:abcd::2
+end
+
+
+
+2001:db8:: /64
+::/0
+fe80::a:0:0:f /10
+fd00:0:0:3000:: /64
+::1/128
+ff00::beef:a00a:aa0:0:0 /12
+
+
+
+
+hextet, hexadecimal, i
+50	3,1,4i
+72	4,2,1i
+115	8,1,2i
+90	6, 3,4i
+
+
+
+
+
+56sites
+fd00:0002:0000:0000:0000:0000:0000:0000/87
+C: 56 = 6bits
+A: /87 + 6bits = /93 (6, 4th,8i)
+fd00:0002:0000:0000:0000:0000:0000:0000/87
+1st site:                              :0008:
+2nd                                     :0010:
+3rd                                      :0018
+
+
+
+18 department
+fd00:3::/115, dinf the 2nd site
+C: 18 = 5bits
+A: 115 + 5 = /120 (8th,2nd,1i)
+fd00:0003:0000:0000:0000:0000:0000:0000
+1st                                                        :0100
+2nd                                                       :0200
+1st valid ip: fd00:3::201/120
+last valid ip: fd00:3::1ff:ffff/120
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
